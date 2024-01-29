@@ -1,0 +1,31 @@
+function getEmailAddresses() {
+  // Create a new spreadsheet or open an existing one
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName('EmailList');
+
+  // If the sheet doesn't exist, create a new one
+  if (!sheet) {
+    sheet = spreadsheet.insertSheet('EmailList');
+    sheet.appendRow(['Email Address']);
+  }
+
+  // Get all threads in the inbox
+  var threads = GmailApp.getInboxThreads();
+
+  // Loop through each thread
+  for (var i = 0; i < threads.length; i++) {
+    // Get all messages in the thread
+    var messages = threads[i].getMessages();
+
+    // Loop through each message
+    for (var j = 0; j < messages.length; j++) {
+      // Extract the sender's email address
+      var emailAddress = messages[j].getFrom();
+
+      // Check if the email address is not already in the sheet
+      if (sheet.getRange('A:A').getValues().flat().indexOf(emailAddress) === -1) {
+        sheet.appendRow([emailAddress]);
+      }
+    }
+  }
+}
