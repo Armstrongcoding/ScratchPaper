@@ -1,0 +1,20 @@
+/**
+ * Returns the HTTP status code for a given URL.
+ *
+ * @param {string} url The URL to check.
+ * @return {number} The HTTP status code of the URL.
+ * @customfunction
+ */
+function GET_STATUS(url) {
+  if (!url) return 'No URL'; // Return if the URL is empty or not provided
+  
+  try {
+    // Make a request to the URL
+    var response = UrlFetchApp.fetch(url, { 'muteHttpExceptions': true });
+    // Return the HTTP status code
+    return response.getResponseCode();
+  } catch (error) {
+    // If there's an error (e.g., invalid URL), return the error message
+    return 'Error: ' + error.toString();
+  }
+}
