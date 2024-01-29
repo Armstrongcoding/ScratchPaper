@@ -1,0 +1,11 @@
+function extractContactInfo() {
+    const contactSection = document.querySelector("#app-container > div > main > div > div.row-fluid > div.login-custom > div > div:nth-child(2)");
+    const phone = contactSection.querySelector("li > a[href^='tel:']").textContent;
+    const email = contactSection.querySelector("li > a[href^='mailto:']").textContent;
+
+    console.log(`Phone: ${phone}, Email: ${email}`);
+    return { phone, email };
+}
+
+// Run the function and store the result
+const contactInfo = extractContactInfo();
