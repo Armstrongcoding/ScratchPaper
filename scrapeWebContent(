@@ -1,0 +1,49 @@
+/**
+ * Scrapes web content for a single URL using the ZenScrape API.
+ * @param {string} url - The URL to scrape.
+ * @return {string} The scraped content or an error message.
+ */
+function scrapeWebContent(url) {
+  var apiKey = '1874aaf0-be4b-11ee-bdf5-332b3a0e0b9e';  // Replace with your actual ZenScrape API key.
+  var encodedUrl = encodeURIComponent(url);
+  var requestUrl = `https://app.zenscrape.com/api/v1/get?apikey=${apiKey}&url=${encodedUrl}&render=true`;
+
+  var options = {
+    'method': 'get',
+    'muteHttpExceptions': true,
+    'followRedirects': true
+  };
+
+  try {
+    var response = UrlFetchApp.fetch(requestUrl, options);
+    // Assuming the response is JSON and you're interested in the 'content' field
+    var jsonResponse = JSON.parse(response.getContentText());
+    return jsonResponse.content;  // Adjust this according to the actual structure of ZenScrape's response
+  } catch (e) {
+    console.error(`Error fetching URL ${url}: ${e.toString()}`);
+    return `Error: ${e.toString()}`;
+  }
+}
+
+/**
+ * Sequentially scrapes a list of URLs provided in a Google Sheet and writes the results to another column.
+ * Assumes URLs start from A2 downwards and results will be written starting from B2.
+ */
+function scrapeMultipleUrls() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var urls = sheet.getRange("A2:A").getValues();  // Adjust the range according to where your URLs are located.
+  var results = [];
+
+  urls.forEach(function(row, index) {
+    if (row[0]) {  // Check if the URL cell is not empty.
+      var content = scrapeWebContent(row[0]);
+      results.push([content]);
+      Utilities.sleep(10000);  // Wait for 10 seconds before the next request to avoid hitting rate limits.
+    } else {
+      results.push([""]);  // Keep the row but add an empty string if there's no URL.
+    }
+  });
+
+  // Write the results to column B, starting from row 2.
+  sheet.getRange(2, 2, results.length, 1).setValues(results);
+}
